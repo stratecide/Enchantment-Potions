@@ -57,14 +57,14 @@ public abstract class PlayerEntityMixin extends LivingEntityMixin {
         if (amount > 0 && !this.isInvulnerableTo(source) && ((Entity) this) instanceof ServerPlayerEntity) {
             if (PotionsMod.BURST_CHANCE > 0 && (DamageSource.FALL == source || DamageSource.CACTUS == source ||
                     DamageSource.FLY_INTO_WALL == source || DamageSource.ANVIL == source || DamageSource.FALLING_BLOCK == source ||
-                    source instanceof EntityDamageSource && !source.getMagic())) {
+                    source instanceof EntityDamageSource && !source.isMagic())) {
                 ServerPlayerEntity self = (ServerPlayerEntity) (Entity) this;
-                for(int i = 0; i < self.inventory.size(); ++i) {
-                    ItemStack itemStack = self.inventory.getStack(i);
+                for(int i = 0; i < self.getInventory().size(); ++i) {
+                    ItemStack itemStack = self.getInventory().getStack(i);
                     if (!itemStack.isEmpty() && (itemStack.getItem() == Items.POTION || itemStack.getItem() == Items.SPLASH_POTION || itemStack.getItem() == Items.LINGERING_POTION) && random.nextFloat() < PotionsMod.BURST_CHANCE) {
                         PotionEntity potionEntity = new PotionEntity(world, self);
                         potionEntity.setItem(itemStack);
-                        potionEntity.setProperties(self, self.pitch, self.yaw, -20.0F, 0.5F, 1.0F);
+                        potionEntity.setProperties(self, self.getPitch(), self.getYaw(), -20.0F, 0.5F, 1.0F);
                         world.spawnEntity(potionEntity);
                         PotionEntityInvoker pot = (PotionEntityInvoker) potionEntity;
                         pot.invokeOnCollision(new EntityHitResult(self));

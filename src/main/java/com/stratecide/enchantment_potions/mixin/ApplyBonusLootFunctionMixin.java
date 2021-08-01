@@ -5,6 +5,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;
@@ -25,22 +26,22 @@ import java.util.Random;
 @Mixin(ApplyBonusLootFunction.class)
 public class ApplyBonusLootFunctionMixin {
 
-    @Shadow @Final private Enchantment enchantment;
+    @Shadow @Final
+    Enchantment enchantment;
 
     @Inject(method = "process", at = @At("HEAD"), cancellable = true)
     private void processInject(ItemStack stack, LootContext context, CallbackInfoReturnable<ItemStack> cir) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        if (PotionsMod.LUCK_GIVES_FORTUNE && this.enchantment == Enchantments.FORTUNE && context.get(LootContextParameters.THIS_ENTITY) instanceof LivingEntity) {
-            ItemStack itemStack = (ItemStack)context.get(LootContextParameters.TOOL);
+        if (PotionsMod.LUCK_GIVES_FORTUNE && this.enchantment == Enchantments.FORTUNE && context.get(LootContextParameters.THIS_ENTITY) instanceof LivingEntity entity) {
+            ItemStack itemStack = context.get(LootContextParameters.TOOL);
             int i = 0;
             if (itemStack != null) {
                 i += EnchantmentHelper.getLevel(this.enchantment, itemStack);
             }
-            LivingEntity entity = (LivingEntity) context.get(LootContextParameters.THIS_ENTITY);
-            if (entity.hasStatusEffect(StatusEffects.LUCK)) {
-                i += 1 + entity.getStatusEffect(StatusEffects.LUCK).getAmplifier();
+            StatusEffectInstance statusEffectInstance = entity.getStatusEffect(StatusEffects.LUCK);
+            if (statusEffectInstance != null) {
+                i += 1 + statusEffectInstance.getAmplifier();
             }
             if (i > 0) {
-                System.out.println("ASDF sum total of Fortune " + i);
                 Field formula = ApplyBonusLootFunction.class.getDeclaredField("formula");
                 formula.setAccessible(true);
                 Object f = formula.get(this);

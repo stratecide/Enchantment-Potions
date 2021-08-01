@@ -2,16 +2,16 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.stratecide.enchantment_potions.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_16",
   "mixins": [
   ],
   "client": [
     "ApplyBonusLootFunctionMixin",
+    "BeaconBlockEntityMixin",
     "BrewingRecipeRegistryMixin",
     "ClientPlayerEntityMixin",
     "CowEntityMixin",
     "EnchantmentHelperMixin",
-    "ItemMixin",
     "LivingEntityMixin",
     "PathAwareEntityMixin",
     "PlayerEntityMixin",

@@ -27,9 +27,9 @@ public abstract class CowEntityMixin extends AnimalEntity {
     @Inject(method = "interactMob", at = @At("HEAD"), cancellable = true)
     public void injectInteractMob(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         ItemStack itemStack = player.getStackInHand(hand);
-        if (itemStack.getItem() == Items.GLASS_BOTTLE && !this.isBaby()) {
+        if (itemStack.isOf(Items.GLASS_BOTTLE) && !this.isBaby()) {
             player.playSound(SoundEvents.ENTITY_COW_MILK, 1.0F, 1.0F);
-            ItemStack itemStack2 = ItemUsage.method_30012(itemStack, player, PotionsMod.MILK_BOTTLE.getDefaultStack());
+            ItemStack itemStack2 = ItemUsage.exchangeStack(itemStack, player, PotionsMod.MILK_BOTTLE.getDefaultStack());
             player.setStackInHand(hand, itemStack2);
             cir.setReturnValue(ActionResult.success(this.world.isClient));
         }

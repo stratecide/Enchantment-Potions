@@ -36,7 +36,6 @@ public class ConfusionGoal extends Goal {
     public void tick() {
         double angle = Math.atan2(this.entity.getLookControl().getLookZ() - this.entity.getZ(), this.entity.getLookControl().getLookX() - this.entity.getX());
         angle += turnSpeed;
-        System.out.println("ConfusionGoal::tick " + angle);
         this.entity.getLookControl().lookAt(this.entity.getX() + Math.cos(angle), this.entity.getEyeY(), this.entity.getZ() + Math.sin(angle));
     }
 }

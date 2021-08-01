@@ -21,8 +21,7 @@ public class MilkBottleItem extends Item {
 
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
         PlayerEntity playerEntity = user instanceof PlayerEntity ? (PlayerEntity)user : null;
-        if (user instanceof ServerPlayerEntity) {
-            ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity)user;
+        if (user instanceof ServerPlayerEntity serverPlayerEntity) {
             Criteria.CONSUME_ITEM.trigger(serverPlayerEntity, stack);
             serverPlayerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
         }
@@ -32,20 +31,20 @@ public class MilkBottleItem extends Item {
         }
 
         if (playerEntity != null) {
-            playerEntity.incrementStat(Stats.USED.getOrCreateStat((Item) ((Object) this)));
-            if (!playerEntity.abilities.creativeMode) {
+            playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
+            if (!playerEntity.getAbilities().creativeMode) {
                 stack.decrement(1);
             }
         }
 
-        if (playerEntity == null || !playerEntity.abilities.creativeMode) {
+        if (playerEntity == null || !playerEntity.getAbilities().creativeMode) {
             if (stack.isEmpty()) {
                 return new ItemStack(Items.GLASS_BOTTLE);
             }
 
             if (playerEntity != null) {
                 ItemStack itemStack2 = new ItemStack(Items.GLASS_BOTTLE);
-                if (!playerEntity.inventory.insertStack(itemStack2)) {
+                if (!playerEntity.getInventory().insertStack(itemStack2)) {
                     playerEntity.dropItem(itemStack2, false);
                 }
             }
