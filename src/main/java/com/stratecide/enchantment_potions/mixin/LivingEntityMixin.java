@@ -1,6 +1,7 @@
 package com.stratecide.enchantment_potions.mixin;
 
 import com.stratecide.enchantment_potions.PotionsMod;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -17,6 +18,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ConcurrentModificationException;
@@ -45,8 +47,9 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Shadow protected abstract void onStatusEffectUpgraded(StatusEffectInstance effect, boolean reapplyEffect, @Nullable Entity source);
 
-    @ModifyVariable(method = "applyEnchantmentsToDamage", at = @At(value = "STORE"), name = "k")
-    int modifyProtection(int protection) {
+    @Redirect(method = "applyEnchantmentsToDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/EnchantmentHelper;getProtectionAmount(Ljava/lang/Iterable;Lnet/minecraft/entity/damage/DamageSource;)I"))
+    private int modifyProtection(Iterable<ItemStack> equipment, DamageSource source) {
+        int protection = EnchantmentHelper.getProtectionAmount(equipment, source);
         StatusEffectInstance statusEffectInstance = this.getStatusEffect(PotionsMod.PROTECTION);
         if (statusEffectInstance != null)
             protection += (1 + statusEffectInstance.getAmplifier()) * 2;

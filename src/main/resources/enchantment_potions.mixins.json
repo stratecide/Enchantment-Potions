@@ -12,6 +12,7 @@
     "ClientPlayerEntityMixin",
     "CowEntityMixin",
     "EnchantmentHelperMixin",
+    "ItemsMixin",
     "LivingEntityMixin",
     "PathAwareEntityMixin",
     "PlayerEntityMixin",

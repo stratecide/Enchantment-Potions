@@ -177,13 +177,5 @@ public class PotionsMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		try {
-			Field maxCount = Item.class.getDeclaredField("maxCount");
-			maxCount.setAccessible(true);
-			maxCount.setInt(Items.POTION, STACK_SIZE);
-			maxCount.setAccessible(false);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
 	}
 }
