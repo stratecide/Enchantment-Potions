@@ -12,12 +12,15 @@
     "ClientPlayerEntityMixin",
     "CowEntityMixin",
     "EnchantmentHelperMixin",
+    "FishingRodItemMixin",
     "ItemsMixin",
     "LivingEntityMixin",
     "PathAwareEntityMixin",
     "PlayerEntityMixin",
     "PotionEntityInvoker",
-    "PotionItemMixin"
+    "PotionItemMixin",
+    "ServerPlayerInteractionManagerMixin",
+    "StatusEffectMixin"
   ],
   "injectors": {
     "defaultRequire": 1

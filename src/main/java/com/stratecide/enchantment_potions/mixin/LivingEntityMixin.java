@@ -50,9 +50,11 @@ public abstract class LivingEntityMixin extends Entity {
     @Redirect(method = "applyEnchantmentsToDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/EnchantmentHelper;getProtectionAmount(Ljava/lang/Iterable;Lnet/minecraft/entity/damage/DamageSource;)I"))
     private int modifyProtection(Iterable<ItemStack> equipment, DamageSource source) {
         int protection = EnchantmentHelper.getProtectionAmount(equipment, source);
-        StatusEffectInstance statusEffectInstance = this.getStatusEffect(PotionsMod.PROTECTION);
-        if (statusEffectInstance != null)
-            protection += (1 + statusEffectInstance.getAmplifier()) * 2;
+        if (source.isFromFalling()) {
+            StatusEffectInstance statusEffectInstance = this.getStatusEffect(PotionsMod.FEATHER_FALLING);
+            if (statusEffectInstance != null)
+                protection += (1 + statusEffectInstance.getAmplifier()) * 3;
+        }
         return protection;
     }
 
@@ -76,8 +78,6 @@ public abstract class LivingEntityMixin extends Entity {
                 StatusEffects.DOLPHINS_GRACE == effect ||
                 StatusEffects.BAD_OMEN == effect ||
                 StatusEffects.HERO_OF_THE_VILLAGE == effect ||
-                PotionsMod.EFFICIENCY == effect ||
-                PotionsMod.PROTECTION == effect ||
                 PotionsMod.FAST_METABOLISM == effect ||
                 PotionsMod.SLOW_METABOLISM == effect;
     }

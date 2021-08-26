@@ -2,12 +2,7 @@ package com.stratecide.enchantment_potions;
 
 import com.stratecide.enchantment_potions.mixin.BrewingRecipeRegistryMixin;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffectType;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.entity.effect.*;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
@@ -18,7 +13,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -29,28 +23,42 @@ public class PotionsMod implements ModInitializer {
 
 	public static int STACK_SIZE = 16;
 
+	public static final StatusEffect MILK;
 	public static final StatusEffect EFFICIENCY;
-	public static final StatusEffect PROTECTION;
 	public static final StatusEffect FAST_METABOLISM;
 	public static final StatusEffect SLOW_METABOLISM;
 	public static final StatusEffect CONFUSION;
 	public static final StatusEffect UNDYING;
+	public static final StatusEffect DEPTH_STRIDER;
+	public static final StatusEffect FEATHER_FALLING;
+	public static final StatusEffect FROST_WALKER;
+	public static final StatusEffect KNOCKBACK;
+	public static final StatusEffect LURE;
+	public static final StatusEffect SILK_TOUCH;
+	public static final StatusEffect SOUL_SPEED;
 
+	public static final Potion MILK_POTION;
 	public static final List<Potion> EFFICIENCY_POTIONS;
-	public static final List<Potion> PROTECTION_POTIONS;
 	public static final List<Potion> LUCK_POTIONS;
 	public static final List<Potion> FAST_METABOLISM_POTIONS;
 	public static final List<Potion> SLOW_METABOLISM_POTIONS;
 	public static final List<Potion> CONFUSION_POTIONS;
 	public static final List<Potion> UNDYING_POTIONS;
-
-	public static final Item MILK_BOTTLE;
+	public static final List<Potion> DEPTH_STRIDER_POTIONS;
+	public static final List<Potion> FEATHER_FALLING_POTIONS;
+	public static final List<Potion> FROST_WALKER_POTIONS;
+	public static final List<Potion> KNOCKBACK_POTIONS;
+	public static final List<Potion> LURE_POTIONS;
+	public static final List<Potion> SILK_TOUCH_POTIONS;
+	public static final List<Potion> SOUL_SPEED_POTIONS;
 
 	private static final String CONFIG_FILE = "config/enchantment_potions.txt";
 	public static boolean WATER_BREATHING_GIVES_AQUA_AFFINITY = true;
 	public static boolean LUCK_GIVES_LOOTING = true;
 	public static boolean LUCK_GIVES_FORTUNE = true;
+	public static boolean LUCK_GIVES_OF_THE_SEA = true;
 	public static double BURST_CHANCE = 0.01; // chance per potion-stack. should be lower than 5%
+	public static boolean GLINT = false;
 
 	private static StatusEffect registerEffect(String id, StatusEffect entry) {
 		return Registry.register(Registry.STATUS_EFFECT, new Identifier(MOD_ID, id), entry);
@@ -61,22 +69,24 @@ public class PotionsMod implements ModInitializer {
 
 	static {
 		readConfig();
-		MILK_BOTTLE = Registry.register(Registry.ITEM, new Identifier(MOD_ID, "milk_bottle"), (Item)(new MilkBottleItem((new Item.Settings()).maxCount(STACK_SIZE).group(ItemGroup.MISC))));
-
+		MILK = registerEffect("milk", new InstantStatusEffect(StatusEffectType.NEUTRAL, 0xffffff));
 		EFFICIENCY = registerEffect("efficiency", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0x8833ee));
-		PROTECTION = registerEffect("protection", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0x0033ee));
 		FAST_METABOLISM = registerEffect("metabolism_high", new StatusEffectModded(StatusEffectType.NEUTRAL, 0xaa0088));
-		SLOW_METABOLISM = registerEffect("metabolism_low", new StatusEffectModded(StatusEffectType.NEUTRAL, 0xaa0088));
+		SLOW_METABOLISM = registerEffect("metabolism_low", new StatusEffectModded(StatusEffectType.NEUTRAL, 0xaa8800));
 		CONFUSION = registerEffect("confusion", new StatusEffectModded(StatusEffectType.HARMFUL, 0xb1b1b1));
 		UNDYING = registerEffect("undying", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0xffdd00));
+		DEPTH_STRIDER = registerEffect("depth_strider", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0x0066bb));
+		FEATHER_FALLING = registerEffect("feather_falling", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0xccbbdd));
+		FROST_WALKER = registerEffect("frost_walker", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0x55ccff));
+		KNOCKBACK = registerEffect("knockback", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0x554422));
+		LURE = registerEffect("lure", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0xaa1155));
+		SILK_TOUCH = registerEffect("silk_touch", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0xddcc77));
+		SOUL_SPEED = registerEffect("soul_speed", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0x777777));
 
+		MILK_POTION = registerPotion("milk", new Potion(new StatusEffectInstance(MILK)));
 		EFFICIENCY_POTIONS = new ArrayList<>();
 		for (int amplifier = 1; amplifier <= 5; amplifier++) {
 			EFFICIENCY_POTIONS.add(registerPotion("efficiency_" + amplifier, new Potion(new StatusEffectInstance(EFFICIENCY, 12000 + (5 - amplifier) * 1200, amplifier - 1))));
-		}
-		PROTECTION_POTIONS = new ArrayList<>();
-		for (int amplifier = 1; amplifier <= 4; amplifier++) {
-			PROTECTION_POTIONS.add(registerPotion("protection_" + amplifier, new Potion(new StatusEffectInstance(PROTECTION, 3600 + (4 - amplifier) * 1200, amplifier - 1))));
 		}
 		LUCK_POTIONS = new ArrayList<>();
 		LUCK_POTIONS.add(Potions.LUCK);
@@ -97,15 +107,38 @@ public class PotionsMod implements ModInitializer {
 		for (int amplifier = 1; amplifier <= 2; amplifier++) {
 			UNDYING_POTIONS.add(registerPotion("undying_" + amplifier, new Potion(new StatusEffectInstance(UNDYING, 3600 + 2400 * (amplifier - 1), 0))));
 		}
+		DEPTH_STRIDER_POTIONS = new ArrayList<>();
+		for (int amplifier = 1; amplifier <= 3; amplifier++) {
+			DEPTH_STRIDER_POTIONS.add(registerPotion("depth_strider_" + amplifier, new Potion(new StatusEffectInstance(DEPTH_STRIDER, 9600, amplifier - 1))));
+		}
+		FEATHER_FALLING_POTIONS = new ArrayList<>();
+		for (int amplifier = 1; amplifier <= 4; amplifier++) {
+			FEATHER_FALLING_POTIONS.add(registerPotion("feather_falling_" + amplifier, new Potion(new StatusEffectInstance(FEATHER_FALLING, 9600, amplifier - 1))));
+		}
+		FROST_WALKER_POTIONS = new ArrayList<>();
+		for (int amplifier = 1; amplifier <= 2; amplifier++) {
+			FROST_WALKER_POTIONS.add(registerPotion("frost_walker_" + amplifier, new Potion(new StatusEffectInstance(FROST_WALKER, 9600, amplifier - 1))));
+		}
+		KNOCKBACK_POTIONS = new ArrayList<>();
+		for (int amplifier = 1; amplifier <= 2; amplifier++) {
+			KNOCKBACK_POTIONS.add(registerPotion("knockback_" + amplifier, new Potion(new StatusEffectInstance(KNOCKBACK, 4800, amplifier - 1))));
+		}
+		LURE_POTIONS = new ArrayList<>();
+		for (int amplifier = 1; amplifier <= 2; amplifier++) {
+			LURE_POTIONS.add(registerPotion("lure_" + amplifier, new Potion(new StatusEffectInstance(LURE, 6000, amplifier - 1))));
+		}
+		SILK_TOUCH_POTIONS = new ArrayList<>();
+		for (int amplifier = 1; amplifier <= 2; amplifier++) {
+			SILK_TOUCH_POTIONS.add(registerPotion("silk_touch_" + amplifier, new Potion(new StatusEffectInstance(SILK_TOUCH, 600 + 11400 * (amplifier - 1), 0))));
+		}
+		SOUL_SPEED_POTIONS = new ArrayList<>();
+		for (int amplifier = 1; amplifier <= 3; amplifier++) {
+			SOUL_SPEED_POTIONS.add(registerPotion("soul_speed_" + amplifier, new Potion(new StatusEffectInstance(SOUL_SPEED, 9600, amplifier - 1))));
+		}
 
 		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.REDSTONE, EFFICIENCY_POTIONS.get(0));
 		for (int i = 1; i < EFFICIENCY_POTIONS.size(); i++) {
 			BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(EFFICIENCY_POTIONS.get(i - 1), Items.GLOWSTONE_DUST, EFFICIENCY_POTIONS.get(i));
-		}
-
-		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.SCUTE, PROTECTION_POTIONS.get(0));
-		for (int i = 1; i < PROTECTION_POTIONS.size(); i++) {
-			BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(PROTECTION_POTIONS.get(i - 1), Items.SCUTE, PROTECTION_POTIONS.get(i));
 		}
 
 		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.RABBIT_FOOT, LUCK_POTIONS.get(0));
@@ -132,6 +165,41 @@ public class PotionsMod implements ModInitializer {
 		for (int i = 1; i < UNDYING_POTIONS.size(); i++) {
 			BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(UNDYING_POTIONS.get(i - 1), Items.EMERALD_BLOCK, UNDYING_POTIONS.get(i));
 		}
+
+		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.PRISMARINE_CRYSTALS, DEPTH_STRIDER_POTIONS.get(0));
+		for (int i = 1; i < DEPTH_STRIDER_POTIONS.size(); i++) {
+			BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(DEPTH_STRIDER_POTIONS.get(i - 1), Items.PRISMARINE_CRYSTALS, DEPTH_STRIDER_POTIONS.get(i));
+		}
+
+		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.FEATHER, FEATHER_FALLING_POTIONS.get(0));
+		for (int i = 1; i < FEATHER_FALLING_POTIONS.size(); i++) {
+			BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(FEATHER_FALLING_POTIONS.get(i - 1), Items.FEATHER, FEATHER_FALLING_POTIONS.get(i));
+		}
+
+		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.SNOW_BLOCK, FROST_WALKER_POTIONS.get(0));
+		for (int i = 1; i < FROST_WALKER_POTIONS.size(); i++) {
+			BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(FROST_WALKER_POTIONS.get(i - 1), Items.SNOW_BLOCK, FROST_WALKER_POTIONS.get(i));
+		}
+
+		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.COOKIE, KNOCKBACK_POTIONS.get(0));
+		for (int i = 1; i < KNOCKBACK_POTIONS.size(); i++) {
+			BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(KNOCKBACK_POTIONS.get(i - 1), Items.COOKIE, KNOCKBACK_POTIONS.get(i));
+		}
+
+		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.BEETROOT, LURE_POTIONS.get(0));
+		for (int i = 1; i < LURE_POTIONS.size(); i++) {
+			BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(LURE_POTIONS.get(i - 1), Items.BEETROOT, LURE_POTIONS.get(i));
+		}
+
+		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.TALL_GRASS, SILK_TOUCH_POTIONS.get(0));
+		for (int i = 1; i < SILK_TOUCH_POTIONS.size(); i++) {
+			BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(SILK_TOUCH_POTIONS.get(i - 1), Items.TALL_GRASS, SILK_TOUCH_POTIONS.get(i));
+		}
+
+		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.NETHER_WART, SOUL_SPEED_POTIONS.get(0));
+		for (int i = 1; i < SOUL_SPEED_POTIONS.size(); i++) {
+			BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(SOUL_SPEED_POTIONS.get(i - 1), Items.TALL_GRASS, SOUL_SPEED_POTIONS.get(i));
+		}
 	}
 
 	public static void readConfig() {
@@ -143,7 +211,9 @@ public class PotionsMod implements ModInitializer {
 						water_breathing_gives_aqua_affinity = true
 						luck_gives_looting = true
 						luck_gives_fortune = true
+						luck_gives_of_the_sea = true
 						burst_chance = 0.005
+						glint = false
 						""");
 			}
 			catch (IOException e) {
@@ -165,8 +235,12 @@ public class PotionsMod implements ModInitializer {
 							LUCK_GIVES_LOOTING = value.startsWith("t");
 					case "luck_gives_fortune" ->
 							LUCK_GIVES_FORTUNE = value.startsWith("t");
+					case "luck_gives_of_the_sea" ->
+							LUCK_GIVES_OF_THE_SEA = value.startsWith("t");
 					case "burst_chance" ->
 							BURST_CHANCE = Math.max(0, Math.min(1, Double.parseDouble(value)));
+					case "glint" ->
+							GLINT = value.startsWith("t");
 				}
 			}
 		}

@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsage;
 import net.minecraft.item.Items;
+import net.minecraft.potion.PotionUtil;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -29,7 +30,7 @@ public abstract class CowEntityMixin extends AnimalEntity {
         ItemStack itemStack = player.getStackInHand(hand);
         if (itemStack.isOf(Items.GLASS_BOTTLE) && !this.isBaby()) {
             player.playSound(SoundEvents.ENTITY_COW_MILK, 1.0F, 1.0F);
-            ItemStack itemStack2 = ItemUsage.exchangeStack(itemStack, player, PotionsMod.MILK_BOTTLE.getDefaultStack());
+            ItemStack itemStack2 = ItemUsage.exchangeStack(itemStack, player, PotionUtil.setPotion(Items.POTION.getDefaultStack(), PotionsMod.MILK_POTION));
             player.setStackInHand(hand, itemStack2);
             cir.setReturnValue(ActionResult.success(this.world.isClient));
         }
