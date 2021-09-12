@@ -136,9 +136,9 @@ public class PotionsMod implements ModInitializer {
 			SOUL_SPEED_POTIONS.add(registerPotion("soul_speed_" + amplifier, new Potion(new StatusEffectInstance(SOUL_SPEED, 9600, amplifier - 1))));
 		}
 
-		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.REDSTONE, EFFICIENCY_POTIONS.get(0));
+		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.COPPER_INGOT, EFFICIENCY_POTIONS.get(0));
 		for (int i = 1; i < EFFICIENCY_POTIONS.size(); i++) {
-			BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(EFFICIENCY_POTIONS.get(i - 1), Items.GLOWSTONE_DUST, EFFICIENCY_POTIONS.get(i));
+			BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(EFFICIENCY_POTIONS.get(i - 1), Items.COPPER_INGOT, EFFICIENCY_POTIONS.get(i));
 		}
 
 		BrewingRecipeRegistryMixin.invokeRegisterPotionRecipe(Potions.MUNDANE, Items.RABBIT_FOOT, LUCK_POTIONS.get(0));
