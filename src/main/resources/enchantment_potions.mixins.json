@@ -13,11 +13,9 @@
     "CowEntityMixin",
     "EnchantmentHelperMixin",
     "FishingRodItemMixin",
-    "ItemsMixin",
     "LivingEntityMixin",
     "PathAwareEntityMixin",
     "PlayerEntityMixin",
-    "PotionEntityInvoker",
     "PotionItemMixin",
     "ServerPlayerInteractionManagerMixin",
     "StatusEffectMixin"

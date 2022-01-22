@@ -18,6 +18,15 @@
   "item.minecraft.splash_potion.effect.milk": "Bottle of Milk",
   "item.minecraft.lingering_potion.effect.milk": "Bottle of Milk",
 
+  "item.minecraft.potion.effect.luck_2": "Potion of Luck II",
+  "item.minecraft.potion.effect.luck_3": "Potion of Luck III",
+  "item.minecraft.splash_potion.effect.luck_2": "Splash Potion of Luck II",
+  "item.minecraft.splash_potion.effect.luck_3": "Splash Potion of Luck III",
+  "item.minecraft.lingering_potion.effect.luck_2": "Lingering Potion of Luck II",
+  "item.minecraft.lingering_potion.effect.luck_3": "Lingering Potion of Luck III",
+  "item.minecraft.tipped_arrow.effect.luck_2": "Arrow of Luck II",
+  "item.minecraft.tipped_arrow.effect.luck_3": "Arrow of Luck III",
+
   "item.minecraft.potion.effect.efficiency_1": "Potion of Efficiency I",
   "item.minecraft.potion.effect.efficiency_2": "Potion of Efficiency II",
   "item.minecraft.potion.effect.efficiency_3": "Potion of Efficiency III",

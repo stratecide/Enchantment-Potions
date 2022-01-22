@@ -21,8 +21,6 @@ public class PotionsMod implements ModInitializer {
 
 	public static final String MOD_ID = "enchantment_potions";
 
-	public static int STACK_SIZE = 16;
-
 	public static final StatusEffect MILK;
 	public static final StatusEffect EFFICIENCY;
 	public static final StatusEffect FAST_METABOLISM;
@@ -57,8 +55,6 @@ public class PotionsMod implements ModInitializer {
 	public static boolean LUCK_GIVES_LOOTING = true;
 	public static boolean LUCK_GIVES_FORTUNE = true;
 	public static boolean LUCK_GIVES_OF_THE_SEA = true;
-	public static double BURST_CHANCE = 0.01; // chance per potion-stack. should be lower than 5%
-	public static boolean GLINT = false;
 
 	private static StatusEffect registerEffect(String id, StatusEffect entry) {
 		return Registry.register(Registry.STATUS_EFFECT, new Identifier(MOD_ID, id), entry);
@@ -69,19 +65,19 @@ public class PotionsMod implements ModInitializer {
 
 	static {
 		readConfig();
-		MILK = registerEffect("milk", new InstantStatusEffect(StatusEffectType.NEUTRAL, 0xffffff));
-		EFFICIENCY = registerEffect("efficiency", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0x8833ee));
-		FAST_METABOLISM = registerEffect("metabolism_high", new StatusEffectModded(StatusEffectType.NEUTRAL, 0xaa0088));
-		SLOW_METABOLISM = registerEffect("metabolism_low", new StatusEffectModded(StatusEffectType.NEUTRAL, 0xaa8800));
-		CONFUSION = registerEffect("confusion", new StatusEffectModded(StatusEffectType.HARMFUL, 0xb1b1b1));
-		UNDYING = registerEffect("undying", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0xffdd00));
-		DEPTH_STRIDER = registerEffect("depth_strider", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0x0066bb));
-		FEATHER_FALLING = registerEffect("feather_falling", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0xccbbdd));
-		FROST_WALKER = registerEffect("frost_walker", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0x55ccff));
-		KNOCKBACK = registerEffect("knockback", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0x554422));
-		LURE = registerEffect("lure", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0xaa1155));
-		SILK_TOUCH = registerEffect("silk_touch", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0xddcc77));
-		SOUL_SPEED = registerEffect("soul_speed", new StatusEffectModded(StatusEffectType.BENEFICIAL, 0x777777));
+		MILK = registerEffect("milk", new InstantStatusEffect(StatusEffectCategory.NEUTRAL, 0xffffff));
+		EFFICIENCY = registerEffect("efficiency", new StatusEffectModded(StatusEffectCategory.BENEFICIAL, 0x8833ee));
+		FAST_METABOLISM = registerEffect("metabolism_high", new StatusEffectModded(StatusEffectCategory.NEUTRAL, 0xaa0088));
+		SLOW_METABOLISM = registerEffect("metabolism_low", new StatusEffectModded(StatusEffectCategory.NEUTRAL, 0xaa8800));
+		CONFUSION = registerEffect("confusion", new StatusEffectModded(StatusEffectCategory.HARMFUL, 0xb1b1b1));
+		UNDYING = registerEffect("undying", new StatusEffectModded(StatusEffectCategory.BENEFICIAL, 0xffdd00));
+		DEPTH_STRIDER = registerEffect("depth_strider", new StatusEffectModded(StatusEffectCategory.BENEFICIAL, 0x0066bb));
+		FEATHER_FALLING = registerEffect("feather_falling", new StatusEffectModded(StatusEffectCategory.BENEFICIAL, 0xccbbdd));
+		FROST_WALKER = registerEffect("frost_walker", new StatusEffectModded(StatusEffectCategory.BENEFICIAL, 0x55ccff));
+		KNOCKBACK = registerEffect("knockback", new StatusEffectModded(StatusEffectCategory.BENEFICIAL, 0x554422));
+		LURE = registerEffect("lure", new StatusEffectModded(StatusEffectCategory.BENEFICIAL, 0xaa1155));
+		SILK_TOUCH = registerEffect("silk_touch", new StatusEffectModded(StatusEffectCategory.BENEFICIAL, 0xddcc77));
+		SOUL_SPEED = registerEffect("soul_speed", new StatusEffectModded(StatusEffectCategory.BENEFICIAL, 0x777777));
 
 		MILK_POTION = registerPotion("milk", new Potion(new StatusEffectInstance(MILK)));
 		EFFICIENCY_POTIONS = new ArrayList<>();
@@ -91,7 +87,7 @@ public class PotionsMod implements ModInitializer {
 		LUCK_POTIONS = new ArrayList<>();
 		LUCK_POTIONS.add(Potions.LUCK);
 		for (int amplifier = 2; amplifier <= 3; amplifier++) {
-			LUCK_POTIONS.add(registerPotion("luck_" + amplifier, new Potion("luck", new StatusEffectInstance(StatusEffects.LUCK, 6000, amplifier - 1))));
+			LUCK_POTIONS.add(registerPotion("luck_" + amplifier, new Potion(new StatusEffectInstance(StatusEffects.LUCK, 6000, amplifier - 1))));
 		}
 		FAST_METABOLISM_POTIONS = new ArrayList<>();
 		SLOW_METABOLISM_POTIONS = new ArrayList<>();
@@ -207,13 +203,10 @@ public class PotionsMod implements ModInitializer {
 		if (!file.exists()) {
 			try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
 				writer.write("""
-						stack = 16
 						water_breathing_gives_aqua_affinity = true
 						luck_gives_looting = true
 						luck_gives_fortune = true
 						luck_gives_of_the_sea = true
-						burst_chance = 0.005
-						glint = false
 						""");
 			}
 			catch (IOException e) {
@@ -227,8 +220,6 @@ public class PotionsMod implements ModInitializer {
 					continue;
 				String value = lineData[1].trim();
 				switch (lineData[0].trim()) {
-					case "stack" ->
-							STACK_SIZE = Math.max(1, Math.min(64, Integer.parseInt(value)));
 					case "water_breathing_gives_aqua_affinity" ->
 							WATER_BREATHING_GIVES_AQUA_AFFINITY = value.startsWith("t");
 					case "luck_gives_looting" ->
@@ -237,10 +228,6 @@ public class PotionsMod implements ModInitializer {
 							LUCK_GIVES_FORTUNE = value.startsWith("t");
 					case "luck_gives_of_the_sea" ->
 							LUCK_GIVES_OF_THE_SEA = value.startsWith("t");
-					case "burst_chance" ->
-							BURST_CHANCE = Math.max(0, Math.min(1, Double.parseDouble(value)));
-					case "glint" ->
-							GLINT = value.startsWith("t");
 				}
 			}
 		}
